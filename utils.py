@@ -24,9 +24,12 @@ def get_session(
     return session
 
 
-def predict_rub_salary_hh(salary: Optional[dict]) -> Optional[int]:
+def predict_rub_salary(
+        salary: Optional[dict],
+        currency_title: str = "RUR"
+) -> Optional[int]:
     """Predicted rub salary from vacancy hh.ru."""
-    if not salary or salary["currency"] != "RUR":
+    if not salary or salary["currency"] != currency_title:
         return None
 
     if salary["from"] and salary["to"]:
