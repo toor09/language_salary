@@ -8,6 +8,7 @@ from requests import ConnectionError, HTTPError
 from settings import LOGGING_CONFIG, Settings, SuperJobSettings
 from utils import (
     fetch_hh_vacancies,
+    fetch_sj_vacancies,
     get_average_salary,
     get_session,
     get_vacancies_processed,
@@ -36,7 +37,7 @@ def collect_hh_salary_stats() -> Optional[dict]:
                 params=params,
             ):
                 predicted_salaries.append(
-                    predict_rub_salary(vacancy["salary"])
+                    predict_rub_salary(salary=vacancy["salary"])
                 )
                 logger.debug(msg=f"{vacancy['salary']=}")
             vacancies_processed = get_vacancies_processed(
@@ -75,33 +76,31 @@ def collect_sj_salary_stats() -> Optional[dict]:
             "catalogues": 48,
             "keyword": lang,
         }
+        predicted_salaries = []
         try:
-            sj_vacancies = session.get(
-                url="https://api.superjob.ru/2.0/vacancies",
-                params=params,  # type: ignore
+            for vacancy in fetch_sj_vacancies(
+                session=session,
+                settings=settings,
                 headers=headers,
-                timeout=settings.TIMEOUT,
-            )
-            sj_vacancies.raise_for_status()
-            vacancies = sj_vacancies.json()
-            predicted_salaries = [
-                predict_rub_salary(
-                    {
-                        "from": vacancy["payment_from"],
-                        "to": vacancy["payment_to"],
-                        "currency": vacancy["currency"],
-                    },
-                    currency_title="rub"
+                params=params,
+            ):
+                predicted_salaries.append(
+                    predict_rub_salary(
+                        salary={
+                            "from": vacancy["payment_from"],
+                            "to": vacancy["payment_to"],
+                            "currency": vacancy["currency"]
+                        },
+                        currency_title="rub"
+                    )
                 )
-                for vacancy in vacancies["objects"]
-            ]
-
+                logger.debug(msg=f"{vacancy=}")
             vacancies_processed = get_vacancies_processed(
                 vacancies=predicted_salaries
             )
             average_salary = get_average_salary(salaries=vacancies_processed)
             salary_stats[lang] = {
-                "vacancies_found": vacancies["total"],
+                "vacancies_found": len(predicted_salaries),
                 "vacancies_processed": len(vacancies_processed),
                 "average_salary": average_salary,
             }

@@ -45,6 +45,27 @@ def fetch_hh_vacancies(
         yield from page_data["items"]
 
 
+def fetch_sj_vacancies(
+        session: requests.Session,
+        settings: Settings,
+        headers: dict,
+        params: dict
+) -> Generator:
+    for page in count():
+        page_response = session.get(
+            url="https://api.superjob.ru/2.0/vacancies",
+            headers=headers,
+            params={'page': page, **params},
+            timeout=settings.TIMEOUT,
+        )
+        page_response.raise_for_status()
+        page_data = page_response.json()
+        if not page_data["more"]:
+            break
+
+        yield from page_data["objects"]
+
+
 def predict_rub_salary(
         salary: Optional[dict],
         currency_title: str = "RUR"
