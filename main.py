@@ -1,12 +1,12 @@
 import logging
 import logging.config
 import time
-from typing import Optional
 
 from requests import ConnectionError, HTTPError
 
 from settings import LOGGING_CONFIG, Settings, SuperJobSettings
 from utils import (
+    draw_table,
     fetch_hh_vacancies,
     fetch_sj_vacancies,
     get_average_salary,
@@ -18,7 +18,7 @@ from utils import (
 logger = logging.getLogger(__file__)
 
 
-def collect_hh_salary_stats() -> Optional[dict]:
+def collect_hh_salary_stats() -> dict:
     """Returned collection with salary statistics from hh.ru."""
     settings = Settings()
     session = get_session(settings=settings)
@@ -62,7 +62,7 @@ def collect_hh_salary_stats() -> Optional[dict]:
     return salary_stats
 
 
-def collect_sj_salary_stats() -> Optional[dict]:
+def collect_sj_salary_stats() -> dict:
     """Returned collection with salary statistics from superjob.ru."""
     settings = SuperJobSettings()
     session = get_session(settings=settings)
@@ -119,8 +119,16 @@ def collect_sj_salary_stats() -> Optional[dict]:
 
 def main() -> None:
     """Main entry for analysis average salaries from hh.ru and superjob.ru."""
-    print(collect_hh_salary_stats())
-    print(collect_sj_salary_stats())
+    salary_hh_stats = collect_hh_salary_stats()
+    salary_sj_stats = collect_sj_salary_stats()
+    draw_table(
+        salaries_stats=salary_hh_stats,
+        aggregator_title="HeadHunter Moscow"
+    )
+    draw_table(
+        salaries_stats=salary_sj_stats,
+        aggregator_title="SuperJob Moscow"
+    )
 
 
 if __name__ == "__main__":

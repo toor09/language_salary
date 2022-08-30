@@ -4,6 +4,7 @@ from typing import Generator, List, Optional
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+from terminaltables import AsciiTable
 
 from settings import Settings
 
@@ -101,3 +102,28 @@ def get_average_salary(salaries: List[int]) -> int:
     if len(salaries) == 0:
         return 0
     return int(sum(salaries)/len(salaries))
+
+
+def draw_table(salaries_stats: dict, aggregator_title: str) -> None:
+    """Returned salaries statistics in table format."""
+    table_content = [
+        (
+            "Язык программирования",
+            "Найдено вакансий",
+            "Обработано вакансий",
+            "Средняя зарплата"
+        ),
+    ]
+    for lang, salary in salaries_stats.items():
+        table_content.append(
+            (
+                lang,
+                salary["vacancies_found"],
+                salary["vacancies_processed"],
+                salary["average_salary"],
+            )
+        )
+    table_instance = AsciiTable(table_content, aggregator_title)
+    for i in range(1, 4):
+        table_instance.justify_columns[i] = "right"
+    print(table_instance.table)
