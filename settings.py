@@ -8,6 +8,7 @@ LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
 class Settings(BaseSettings):
     PROGRAMING_LANGUAGES: str = "Python,Golang,NodeJS,Java,Rust,C,C++,C#,PHP,Ruby,Scala"  # noqa: E501
+    TIMEOUT: int = 10
     RETRY_COUNT: int = 5
     STATUS_FORCE_LIST: str = "429,500,502,503,504"
     ALLOWED_METHODS: str = "HEAD,GET,OPTIONS"

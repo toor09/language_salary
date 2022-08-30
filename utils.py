@@ -1,3 +1,5 @@
+from typing import List, Optional
+
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
@@ -8,7 +10,7 @@ from settings import Settings
 def get_session(
         settings: Settings
 ) -> requests.Session:
-    """Get new request session with retry strategy."""
+    """Returned new request session with retry strategy."""
     retry_strategy = Retry(
         total=settings.RETRY_COUNT,
         status_forcelist=settings.STATUS_FORCE_LIST,
@@ -20,3 +22,37 @@ def get_session(
     session.mount("https://", adapter)
     session.mount("http://", adapter)
     return session
+
+
+def predict_rub_salary_hh(salary: Optional[dict]) -> Optional[int]:
+    """Predicted rub salary from vacancy hh.ru."""
+    if not salary or salary["currency"] != "RUR":
+        return None
+
+    if salary["from"] and salary["to"]:
+        salary = salary["from"] + salary["to"] / 2
+    elif salary["from"]:
+        salary = salary["from"] * 1.2
+    elif salary["to"]:
+        salary = salary["to"] * 0.8
+    else:
+        return None
+
+    return int(salary)  # type: ignore
+
+
+def get_vacancies_processed(vacancies: List[Optional[int]]) -> List[int]:
+    """Returned collection of only specified salaries."""
+    specified_salary_vacancies = []
+    for specified_salary_vacancy in vacancies:
+        if not specified_salary_vacancy:
+            continue
+        specified_salary_vacancies.append(specified_salary_vacancy)
+    return specified_salary_vacancies
+
+
+def get_average_salary(salaries: List[int]) -> int:
+    """Returned average salary."""
+    if len(salaries) == 0:
+        return 0
+    return int(sum(salaries)/len(salaries))

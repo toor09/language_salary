@@ -40,6 +40,7 @@ cp .env.example .env
   <pre>
     SUPERJOB_API_KEY=
     PROGRAMING_LANGUAGES=Python,Golang,NodeJS,Java,Rust,C,C++,C#,PHP,Ruby,Scala
+    TIMEOUT=10
     RETRY_COUNT=5
     STATUS_FORCE_LIST=429,500,502,503,504
     ALLOWED_METHODS=HEAD,GET,OPTIONS
