@@ -7,6 +7,7 @@ from requests import ConnectionError, HTTPError
 
 from settings import LOGGING_CONFIG, Settings, SuperJobSettings
 from utils import (
+    fetch_hh_vacancies,
     get_average_salary,
     get_session,
     get_vacancies_processed,
@@ -27,24 +28,23 @@ def collect_hh_salary_stats() -> Optional[dict]:
             "area": 1,
             "text": f"Программист {lang}",
         }
+        predicted_salaries = []
         try:
-            hh_vacancies = session.get(
-                url="https://api.hh.ru/vacancies",
-                params=params,  # type: ignore
-                timeout=settings.TIMEOUT,
-            )
-            hh_vacancies.raise_for_status()
-            vacancies = hh_vacancies.json()
-            predicted_salaries = [
-                predict_rub_salary(vacancy["salary"])
-                for vacancy in vacancies["items"]
-            ]
+            for vacancy in fetch_hh_vacancies(
+                session=session,
+                settings=settings,
+                params=params,
+            ):
+                predicted_salaries.append(
+                    predict_rub_salary(vacancy["salary"])
+                )
+                logger.debug(msg=f"{vacancy['salary']=}")
             vacancies_processed = get_vacancies_processed(
                 vacancies=predicted_salaries
             )
             average_salary = get_average_salary(salaries=vacancies_processed)
             salary_stats[lang] = {
-                "vacancies_found": vacancies["found"],
+                "vacancies_found": len(predicted_salaries),
                 "vacancies_processed": len(vacancies_processed),
                 "average_salary": average_salary,
             }

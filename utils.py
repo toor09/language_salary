@@ -1,4 +1,5 @@
-from typing import List, Optional
+from itertools import count
+from typing import Generator, List, Optional
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -22,6 +23,26 @@ def get_session(
     session.mount("https://", adapter)
     session.mount("http://", adapter)
     return session
+
+
+def fetch_hh_vacancies(
+        session: requests.Session,
+        settings: Settings,
+        params: dict
+) -> Generator:
+    """Returned vacancies from all pages hh.ru."""
+    for page in count():
+        page_response = session.get(
+            url="https://api.hh.ru/vacancies",
+            params={'page': page, **params},
+            timeout=settings.TIMEOUT,
+        )
+        page_response.raise_for_status()
+        page_data = page_response.json()
+        if page >= page_data["pages"]:
+            break
+
+        yield from page_data["items"]
 
 
 def predict_rub_salary(
