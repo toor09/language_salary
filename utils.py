@@ -87,16 +87,6 @@ def predict_rub_salary(
     return int(salary)  # type: ignore
 
 
-def get_processed_vacancies(vacancies: List[Optional[int]]) -> List[int]:
-    """Returned collection of only specified salaries."""
-    specified_salary_vacancies = []
-    for specified_salary_vacancy in vacancies:
-        if not specified_salary_vacancy:
-            continue
-        specified_salary_vacancies.append(specified_salary_vacancy)
-    return specified_salary_vacancies
-
-
 def get_average_salary(salaries: List[int]) -> int:
     """Returned average salary."""
     if len(salaries) == 0:

@@ -10,7 +10,6 @@ from utils import (
     fetch_hh_vacancies,
     fetch_sj_vacancies,
     get_average_salary,
-    get_processed_vacancies,
     get_session,
     predict_rub_salary
 )
@@ -32,22 +31,28 @@ def collect_hh_salary_stats() -> dict:
         }
         predicted_salaries = []
         try:
+            found_count = 0
             for vacancy in fetch_hh_vacancies(
                 session=session,
                 settings=settings,
                 params=params,
             ):
-                predicted_salaries.append(
-                    predict_rub_salary(salary=vacancy["salary"])
-                )
                 logger.debug(msg=f"{vacancy['salary']=}")
-            processed_vacancies = get_processed_vacancies(
-                vacancies=predicted_salaries
-            )
-            average_salary = get_average_salary(salaries=processed_vacancies)
+                predicted_salary = predict_rub_salary(
+                    salary=vacancy["salary"]
+                )
+
+                if not predicted_salary:
+                    found_count += 1
+                    continue
+
+                predicted_salaries.append(predicted_salary)
+                found_count += 1
+            average_salary = get_average_salary(salaries=predicted_salaries)
+
             salary_stats[lang] = {
-                "vacancies_found": len(predicted_salaries),
-                "vacancies_processed": len(processed_vacancies),
+                "vacancies_found": found_count,
+                "vacancies_processed": len(predicted_salaries),
                 "average_salary": average_salary,
             }
 
@@ -79,30 +84,34 @@ def collect_sj_salary_stats() -> dict:
         }
         predicted_salaries = []
         try:
+            found_count = 0
             for vacancy in fetch_sj_vacancies(
                 session=session,
                 settings=settings,
                 headers=headers,
                 params=params,
             ):
-                predicted_salaries.append(
-                    predict_rub_salary(
-                        salary={
-                            "from": vacancy["payment_from"],
-                            "to": vacancy["payment_to"],
-                            "currency": vacancy["currency"]
-                        },
-                        currency_title="rub"
-                    )
-                )
                 logger.debug(msg=f"{vacancy=}")
-            processed_vacancies = get_processed_vacancies(
-                vacancies=predicted_salaries
-            )
-            average_salary = get_average_salary(salaries=processed_vacancies)
+                predicted_salary = predict_rub_salary(
+                    salary={
+                        "from": vacancy["payment_from"],
+                        "to": vacancy["payment_to"],
+                        "currency": vacancy["currency"],
+                    },
+                    currency_title="rub"
+                )
+
+                if not predicted_salary:
+                    found_count += 1
+                    continue
+
+                predicted_salaries.append(predicted_salary)
+                found_count += 1
+
+            average_salary = get_average_salary(salaries=predicted_salaries)
             salary_stats[lang] = {
-                "vacancies_found": len(predicted_salaries),
-                "vacancies_processed": len(processed_vacancies),
+                "vacancies_found": found_count,
+                "vacancies_processed": len(predicted_salaries),
                 "average_salary": average_salary,
             }
 
