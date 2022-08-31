@@ -33,17 +33,17 @@ def fetch_hh_vacancies(
 ) -> Generator:
     """Returned vacancies from all pages hh.ru."""
     for page in count():
-        page_response = session.get(
+        vacancy_page = session.get(
             url="https://api.hh.ru/vacancies",
             params={'page': page, **params},
             timeout=settings.TIMEOUT,
         )
-        page_response.raise_for_status()
-        page_data = page_response.json()
-        if page >= page_data["pages"]:
+        vacancy_page.raise_for_status()
+        vacancies = vacancy_page.json()
+        if page >= vacancies["pages"]:
             break
 
-        yield from page_data["items"]
+        yield from vacancies["items"]
 
 
 def fetch_sj_vacancies(
@@ -53,18 +53,18 @@ def fetch_sj_vacancies(
         params: dict
 ) -> Generator:
     for page in count():
-        page_response = session.get(
+        vacancy_page = session.get(
             url="https://api.superjob.ru/2.0/vacancies",
             headers=headers,
             params={'page': page, **params},
             timeout=settings.TIMEOUT,
         )
-        page_response.raise_for_status()
-        page_data = page_response.json()
-        if not page_data["more"]:
+        vacancy_page.raise_for_status()
+        vacancies = vacancy_page.json()
+        if not vacancies["more"]:
             break
 
-        yield from page_data["objects"]
+        yield from vacancies["objects"]
 
 
 def predict_rub_salary(
