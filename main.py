@@ -4,7 +4,7 @@ import time
 
 from requests import ConnectionError, HTTPError
 
-from settings import LOGGING_CONFIG, Settings, SuperJobSettings
+from settings import LOGGING_CONFIG, HeadHunterSettings, SuperJobSettings
 from utils import (
     draw_table,
     fetch_hh_vacancies,
@@ -21,13 +21,13 @@ logging.config.dictConfig(LOGGING_CONFIG)
 
 def collect_hh_salary_stats() -> dict:
     """Returned collection with salary statistics from hh.ru."""
-    settings = Settings()
+    settings = HeadHunterSettings()
     session = get_session(settings=settings)
     salary_stats = {}
     for lang in settings.PROGRAMING_LANGUAGES:
         params = {
-            "specialization": 1.221,
-            "area": 1,
+            "specialization": settings.PROFESSIONAL_SPECIALIZATION,
+            "area": settings.REGION,
             "text": f"Программист {lang}",
         }
         predicted_salaries = []
@@ -73,8 +73,8 @@ def collect_sj_salary_stats() -> dict:
     }
     for lang in settings.PROGRAMING_LANGUAGES:
         params = {
-            "town": 4,
-            "catalogues": 48,
+            "catalogues": settings.PROFESSIONAL_SPECIALIZATION,
+            "town": settings.REGION,
             "keyword": lang,
         }
         predicted_salaries = []

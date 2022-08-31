@@ -42,8 +42,15 @@ class Settings(BaseSettings):
         env_file = ".env"
 
 
+class HeadHunterSettings(Settings):
+    PROFESSIONAL_SPECIALIZATION: float = 1.221
+    REGION: int = 1
+
+
 class SuperJobSettings(Settings):
     SUPERJOB_API_KEY: str
+    PROFESSIONAL_SPECIALIZATION: int = 48
+    REGION: int = 4
 
 
 LOGGING_CONFIG = {
