@@ -16,6 +16,7 @@ from utils import (
 )
 
 logger = logging.getLogger(__file__)
+logging.config.dictConfig(LOGGING_CONFIG)
 
 
 def collect_hh_salary_stats() -> dict:
@@ -132,5 +133,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    logging.config.dictConfig(LOGGING_CONFIG)
     main()
