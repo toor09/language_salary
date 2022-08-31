@@ -10,8 +10,8 @@ from utils import (
     fetch_hh_vacancies,
     fetch_sj_vacancies,
     get_average_salary,
+    get_processed_vacancies,
     get_session,
-    get_vacancies_processed,
     predict_rub_salary
 )
 
@@ -41,13 +41,13 @@ def collect_hh_salary_stats() -> dict:
                     predict_rub_salary(salary=vacancy["salary"])
                 )
                 logger.debug(msg=f"{vacancy['salary']=}")
-            vacancies_processed = get_vacancies_processed(
+            processed_vacancies = get_processed_vacancies(
                 vacancies=predicted_salaries
             )
-            average_salary = get_average_salary(salaries=vacancies_processed)
+            average_salary = get_average_salary(salaries=processed_vacancies)
             salary_stats[lang] = {
                 "vacancies_found": len(predicted_salaries),
-                "vacancies_processed": len(vacancies_processed),
+                "vacancies_processed": len(processed_vacancies),
                 "average_salary": average_salary,
             }
 
@@ -96,13 +96,13 @@ def collect_sj_salary_stats() -> dict:
                     )
                 )
                 logger.debug(msg=f"{vacancy=}")
-            vacancies_processed = get_vacancies_processed(
+            processed_vacancies = get_processed_vacancies(
                 vacancies=predicted_salaries
             )
-            average_salary = get_average_salary(salaries=vacancies_processed)
+            average_salary = get_average_salary(salaries=processed_vacancies)
             salary_stats[lang] = {
                 "vacancies_found": len(predicted_salaries),
-                "vacancies_processed": len(vacancies_processed),
+                "vacancies_processed": len(processed_vacancies),
                 "average_salary": average_salary,
             }
 
