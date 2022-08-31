@@ -94,7 +94,7 @@ def get_average_salary(salaries: List[int]) -> int:
     return int(sum(salaries)/len(salaries))
 
 
-def draw_table(salaries_stats: dict, aggregator_title: str) -> None:
+def generate_table(salaries_stats: dict, aggregator_title: str) -> AsciiTable:
     """Returned salaries statistics in table format."""
     table_content = [
         (
@@ -116,4 +116,4 @@ def draw_table(salaries_stats: dict, aggregator_title: str) -> None:
     table_instance = AsciiTable(table_content, aggregator_title)
     for i in range(1, 4):
         table_instance.justify_columns[i] = "right"
-    print(table_instance.table)
+    return table_instance.table

@@ -6,9 +6,9 @@ from requests import ConnectionError, HTTPError
 
 from settings import LOGGING_CONFIG, HeadHunterSettings, SuperJobSettings
 from utils import (
-    draw_table,
     fetch_hh_vacancies,
     fetch_sj_vacancies,
+    generate_table,
     get_average_salary,
     get_session,
     predict_rub_salary
@@ -131,13 +131,17 @@ def main() -> None:
     """Main entry for analysis average salaries from hh.ru and superjob.ru."""
     salary_hh_stats = collect_hh_salary_stats()
     salary_sj_stats = collect_sj_salary_stats()
-    draw_table(
-        salaries_stats=salary_hh_stats,
-        aggregator_title="HeadHunter Moscow"
+    print(
+        generate_table(
+            salaries_stats=salary_hh_stats,
+            aggregator_title="HeadHunter Moscow"
+        )
     )
-    draw_table(
-        salaries_stats=salary_sj_stats,
-        aggregator_title="SuperJob Moscow"
+    print(
+        generate_table(
+            salaries_stats=salary_sj_stats,
+            aggregator_title="SuperJob Moscow"
+        )
     )
 
 
